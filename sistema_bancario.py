@@ -30,6 +30,11 @@ Se o extrato estiver em branco, exibir a mensagem: Não foram realizadas movimen
 Os valores devem ser exibidos utilizando o formato R$ xxx.xx, exemplo:
 1500.45 = R$ 1500.45
 '''
+LIMITE = 500 
+LIMITE_SAQUES = 3
+saques_realizados = 0
+saldo = 0
+extrato = ''
 
 menu = """
   Digite a operação que deseja realizar:
@@ -37,71 +42,64 @@ menu = """
     [S] Saque
     [E] Extrato
     [Q] sair
-"""
-
-LIMITE_SAQUE = 500
-LIMITE_SAQUE_DIARIO = 3
-numero_saque = 3
-saldo = 0
-extrato = ''
-saques = []
-depositos = []
-
+==>"""
 
 while True:
     opcao = input(menu).upper()
 
     if opcao == 'D':
-        print('Opção escolhida Depósito.')
-        valor_deposito = int(input('Digite o valor do depósito: '))
-        saldo += valor_deposito
-        depositos.append(valor_deposito)
+        print('Operação escolhida Depósito')
+        valor = float(input('Informe o valo de Depósito: '))
 
+        if valor >0:
+            saldo += valor
+            extrato += f'Deposito: R$ {valor:.2f}\n'
+            print('Depósito realizado com Sucesso!')
+            
+        else:
+            print('A operação falhou, valor informado é inválido!')
+       
 
     elif opcao == 'S':
-        print('Opção escolhida Saque.')
+        valor = float(input('Digite o valor que deseja sacar: '))
+       
+        saldo_insuficiente = valor > saldo
+        limite_superior = valor >LIMITE
+        excedeu_limite_saques = saques_realizados >= LIMITE_SAQUES
 
-        if 0 < numero_saque:
-            valor_saque = int(input('Digite o valor do Saque: '))
+        if saldo_insuficiente:
+            print('A operação falhou, valor informado é maior do que o saldo disponivel!')
+        
+        elif limite_superior:
+            print('A operação falhou, valor informado é maior do que o limite diario!')
 
-            if valor_saque <= LIMITE_SAQUE:
-                if saldo >= valor_saque:
-                    print('Saque Realizado com sucesso!!!')
-                    saldo -= valor_saque
-                    numero_saque -= 1
-                    saques.append(valor_saque)
+        elif excedeu_limite_saques:
+            print('A operação falhou, limite diario de saques atingido!')
 
-                else:
-                    print("Saldo Insuficiente, verifique o Saldo!")
+        elif valor > 0:
+            saldo -= valor
+            extrato += f'Saque: R$ {valor:.2f}\n'
+            saques_realizados += 1
+            print('Saque realizado com Sucesso!')
 
-            else:
-                print(f'O valor solicitado (R${valor_saque:.2f}) ultrapassa o limite de saque de R${LIMITE_SAQUE:.2f}. ')
-                
         else:
-            print(f'Quantidade de Saques realizados hoje utrapassou o limite de {LIMITE_SAQUE_DIARIO} saques diarios.')
-
-
+            print('A operação falhou, valor informado é inválido!')
+       
+    
     elif opcao == 'E':
-        print('Opção escolhida Extrato.\n')
-        print('DEPOSITOS:\n')
+        print('=-='*15)
+        print("Sem Movimentações realizadas" if not extrato else extrato)
+        print(f'Saldo Disponivel R${saldo:.2f} ')
+        print('=-='*15)
 
-        for i, v, in enumerate(depositos):
-            print(f'{i+1}º Deposito, valor de R${v:.2f}.')
         
-        print('\nSAQUES:\n')
-        
-        for i, v, in enumerate(saques):
-            print(f'{i+1}º Saque, valor de R${v:.2f}.')
-
-        print(f'\nSaldo disponivel: R${saldo:.2f}.')
-
-
     elif opcao == 'Q':
-        print('Obrigado por ser nosso cliente!!!')
+        print('Obrigado por ser nosso cliente')
+        print('Volte Sempre!!!')
         break
 
-
+       
     else:
         print('opção invalida, tente novamente')
-
-
+        
+        
